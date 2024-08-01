@@ -18,7 +18,7 @@ export default function Index(props) {
             alert("Article has succesfully Deleted")
             router.push("/articlesUI")
         }
-        catch(error){ console.log(error)}   
+        catch(error){  console.error('Erreur lors de la suppression:', error.message);}   
     }
 
     
@@ -44,12 +44,20 @@ export default function Index(props) {
   )
 }
 
-
-export async function getStaticProps(){
-
-        const reponse = await axios.get(`${domain}/articleApi`);
-
-        return {
-                    props : { data :reponse.data}
-               }
+export async function getStaticProps() {
+    try {
+      const response = await axios.get(`${domain}/articleApi`);
+      return {
+        props: { data: response.data },
+        revalidate: 10, // Répéter la récupération des données toutes les 10 secondes
+      };
+    } catch (error) {
+      console.error('Erreur lors de la récupération des données:', error.message);
+      return {
+        props: {
+          data: [], // Retourner un tableau vide ou des données par défaut
+          error: 'Erreur lors de la récupération des données.',
+        },
+      };
     }
+  }
